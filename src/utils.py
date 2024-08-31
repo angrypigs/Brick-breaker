@@ -1,0 +1,15 @@
+HEIGHT = 1000
+WIDTH = 1000
+FPS = 60
+X_OFFSET = 200
+Y_OFFSET = 200
+BRICK_SIZE = 55
+BRICK_GAP = 5
+
+COLORS = (
+    None,
+    (152, 31, 31),
+    (31, 33, 153),
+    (213, 214, 216),
+    (255, 140, 0),
+)
