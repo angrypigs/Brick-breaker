@@ -25,7 +25,8 @@ class Level:
         self.screen.blit(self.bg, (0, 0))
         for i in range(GRID_HEIGHT):
             for j in range(GRID_WIDTH):
-                self.matrix[i][j].draw()
+                if self.matrix[i][j] is not None:
+                    self.matrix[i][j].draw()
 
     def pressed(self, pos: tuple[int, int]) -> int:
         row = (pos[1] - Y_OFFSET - BRICK_GAP) // (BRICK_SIZE + BRICK_GAP)
@@ -35,7 +36,19 @@ class Level:
             self.matrix[row][col] is not None):
             visited = [[False for x in range(GRID_WIDTH)] for y in range(GRID_HEIGHT)]
             blob = self.dfs_board(row, col, visited, self.matrix[row][col].index)
-            print(blob)
+            if len(blob) > 2:
+                blob.sort(key=lambda x: (x[0], x[1]))
+                cols_to_fall = {i: 0 for i in range(GRID_WIDTH)}
+                for c in blob:
+                    self.matrix[c[0]][c[1]] = None
+                    cols_to_fall[c[1]] += 1
+                for key, c in cols_to_fall.items():
+                    if c > 0:
+                        for _ in range(c):
+                            for i in range(GRID_HEIGHT - 1, 0, -1):
+                                if self.matrix[i][key] is None and self.matrix[i - 1][key] is not None:
+                                    self.matrix[i][key], self.matrix[i - 1][key] = self.matrix[i - 1][key], self.matrix[i][key]
+                                    self.matrix[i][key].fall_counter += 1               
 
     def dfs_board(self, row: int, col: int, visited: list[list[bool]], 
                   target: int) -> list[tuple[int, int]]:
