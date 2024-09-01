@@ -26,3 +26,30 @@ class Level:
         for i in range(GRID_HEIGHT):
             for j in range(GRID_WIDTH):
                 self.matrix[i][j].draw()
+
+    def pressed(self, pos: tuple[int, int]) -> int:
+        row = (pos[1] - Y_OFFSET - BRICK_GAP) // (BRICK_SIZE + BRICK_GAP)
+        col = (pos[0] - X_OFFSET - BRICK_GAP) // (BRICK_SIZE + BRICK_GAP)
+        if (row >= 0 and row < GRID_HEIGHT and
+            col >= 0 and col < GRID_WIDTH and
+            self.matrix[row][col] is not None):
+            visited = [[False for x in range(GRID_WIDTH)] for y in range(GRID_HEIGHT)]
+            blob = self.dfs_board(row, col, visited, self.matrix[row][col].index)
+            print(blob)
+
+    def dfs_board(self, row: int, col: int, visited: list[list[bool]], 
+                  target: int) -> list[tuple[int, int]]:
+        if (row < 0 or row >= GRID_HEIGHT or 
+            col < 0 or col >= GRID_WIDTH or
+            self.matrix[row][col] is None or 
+            visited[row][col] or
+            self.matrix[row][col].index != target):
+            return []
+        
+        visited[row][col] = True
+        blob = [(row, col)]
+        blob += self.dfs_board(row + 1, col, visited, target)
+        blob += self.dfs_board(row - 1, col, visited, target)
+        blob += self.dfs_board(row, col + 1, visited, target)
+        blob += self.dfs_board(row, col - 1, visited, target)
+        return blob
