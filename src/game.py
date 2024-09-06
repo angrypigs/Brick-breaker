@@ -23,7 +23,8 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     match self.game_mode:
                         case 1:
-                            res = self.menu.pressed(event.pos)
+                            if self.menu:
+                                res = self.menu.pressed(event.pos)
             self.menu.draw(pygame.mouse.get_pos())
             pygame.display.flip()
             self.clock.tick(FPS)
