@@ -13,7 +13,7 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption('Brick breaker')
         self.clock = pygame.time.Clock()
-        self.menu = Level(self.screen)
+        self.menu = Level(self.screen, 60)
         self.game_mode = 1
         while True:
             for event in pygame.event.get():

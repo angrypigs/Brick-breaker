@@ -9,17 +9,25 @@ from src.brick import Brick
 
 class Level:
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self, 
+                 screen: pygame.Surface,
+                 lvl: int) -> None:
         self.screen = screen
         self.bg = pygame.Surface((WIDTH, HEIGHT))
-        self.bg.fill((98, 122, 174))
-        pygame.draw.rect(self.bg, (46, 59, 85), (
+        self.bg.fill((44, 77, 144))
+        self.LIMIT = 120 + 10 * (lvl % 5) if lvl < len(COLORS) * 5 else 160
+        self.lvl = lvl
+        self._blocks_destroyed = 0
+        pygame.draw.rect(self.bg, (18, 36, 72), (
             X_OFFSET, Y_OFFSET, 
             GRID_WIDTH * (BRICK_GAP + BRICK_SIZE) + BRICK_GAP, 
             GRID_HEIGHT * (BRICK_GAP + BRICK_SIZE) + BRICK_GAP
         ))
+        pygame.draw.rect(self.bg, (18, 36, 72), (
+            Y_OFFSET, Y_OFFSET, 360, GRID_HEIGHT * (BRICK_GAP + BRICK_SIZE) + BRICK_GAP
+        ))
         self.BRICK_RANGE = 3
-        self.matrix : list[list[Brick | None]] = [[Brick(self.screen, random.randint(1, self.BRICK_RANGE), (y, x))
+        self.matrix : list[list[Brick | None]] = [[Brick(self.screen, random.randint(1, min(lvl // 5 + 3, len(COLORS) - 1)), (y, x))
                                                    for y in range(GRID_WIDTH)] for x in range(GRID_HEIGHT)]
 
     def __bool__(self) -> bool:
@@ -78,6 +86,11 @@ class Level:
                                     break
                 for i in self.matrix:
                     print(i)
+                self._blocks_destroyed -= len(blob)
+                if self._blocks_destroyed >= self.LIMIT:
+                    return 1
+        return 0
+                
                         
 
     def dfs_board(self, row: int, col: int, visited: list[list[bool]], 
