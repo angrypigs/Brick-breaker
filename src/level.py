@@ -21,19 +21,18 @@ class Level:
         self.BRICK_RANGE = 3
         self.matrix : list[list[Brick | None]] = [[Brick(self.screen, random.randint(1, self.BRICK_RANGE), (y, x))
                                                    for y in range(GRID_WIDTH)] for x in range(GRID_HEIGHT)]
-        for i in self.matrix:
-            print()
-            for j in i:
-                print(j)
 
     def __bool__(self) -> bool:
-        return all([x is None or not x for y in self.matrix for x in y])
+        return all([x is None or x for y in self.matrix for x in y])
         
     def draw(self, cursor_pos: tuple[int, int]) -> None:
         self.screen.blit(self.bg, (0, 0))
+        flag = all([x is None or not all(x.anim) for y in self.matrix for x in y])
         for j in range(GRID_WIDTH):
             for i in reversed(range(GRID_HEIGHT)):
                 if self.matrix[i][j] is not None:
+                    if flag and self.matrix[i][j].anim[1] and not self.matrix[i][j].anim_flag:
+                        self.matrix[i][j].anim_flag = True
                     self.matrix[i][j].draw()
                 else:
                     break
@@ -52,7 +51,6 @@ class Level:
                 for c in blob:
                     self.matrix[c[0]][c[1]] = None
                     cols_to_fall[c[1]] += 1
-                print("lol")
                 for key, c in cols_to_fall.items():
                     if c > 0:
                         for _ in range(c):
@@ -66,7 +64,6 @@ class Level:
                             for row in range(GRID_HEIGHT - 1, -1, -1):
                                 if self.matrix[row][i] is not None:
                                     self.matrix[row][i].counter.x += 1
-                                    print(row, i, 1)
                                     self.matrix[row][i], self.matrix[row][i + 1] = self.matrix[row][i + 1], self.matrix[row][i]
                                 else:
                                     break
@@ -75,14 +72,12 @@ class Level:
                         for i in range(GRID_WIDTH - 1 - col, GRID_WIDTH):
                             for row in range(GRID_HEIGHT - 1, -1, -1):
                                 if self.matrix[row][i] is not None:
-                                    print(row, i, -1)
                                     self.matrix[row][i].counter.x -= 1
                                     self.matrix[row][i], self.matrix[row][i - 1] = self.matrix[row][i - 1], self.matrix[row][i]
                                 else:
                                     break
                 for i in self.matrix:
-                        print(i)
-                        
+                    print(i)
                         
 
     def dfs_board(self, row: int, col: int, visited: list[list[bool]], 
@@ -93,7 +88,6 @@ class Level:
             visited[row][col] or
             self.matrix[row][col].index != target):
             return []
-        
         visited[row][col] = True
         blob = [(row, col)]
         blob += self.dfs_board(row + 1, col, visited, target)

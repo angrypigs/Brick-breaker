@@ -19,10 +19,11 @@ class Brick:
             X_OFFSET + BRICK_GAP * (pos[0] + 1) + BRICK_SIZE * pos[0],
             Y_OFFSET + BRICK_GAP * (pos[1] + 1) + BRICK_SIZE * pos[1],
         )
-        self._anim = False
+        self.anim = [False, False]
+        self.anim_flag = False
 
     def __bool__(self) -> bool:
-        return self._anim
+        return not any(self.anim)
     
     def __str__(self) -> str:
         return f"Brick | coords: {self.coords[0]} {self.coords[1]} | index: {self.index}"
@@ -32,30 +33,32 @@ class Brick:
     
     def draw(self) -> None:
         pygame.draw.rect(self.screen, COLORS[self.index], (self.coords, (BRICK_SIZE, BRICK_SIZE)), border_radius=5)
-        if (self.counter.x != 0 or self.counter.y > 0) and not self._anim:
+        if (self.counter.x != 0 or self.counter.y > 0) and self.__bool__():
             self.__start_falling()
-        if self._anim:
-            if self.limit.y - self.coords.y < 8:
+        if self.anim[0]:
+            if self.limit.y - self.coords.y < 10:
                 self.coords.y = self.limit.y
                 self.counter.y = 0
                 self.velocity.y = 0
+                self.anim[0] = False
             else:
                 self.coords.y += self.velocity.y
-                self.velocity.y += 0.981 * 3
-            if self.counter.y == 0:
-                if abs(self.limit.x - self.coords.x) < 8:
-                    self.coords.x = self.limit.x
-                    self.counter.x = 0
-                    self.velocity.x = 0
-                    self._anim = False
-                else:
-                    self.coords.x += self.velocity.x
-                    self.velocity.x += 0.981 * 3 * (-1 if self.counter.x < 0 else 1)
+                self.velocity.y += 0.981 * BRICK_SPEED
+        if self.anim[1] and self.anim_flag:
+            if abs(self.limit.x - self.coords.x) < 10:
+                self.coords.x = self.limit.x
+                self.counter.x = 0
+                self.velocity.x = 0
+                self.anim[1] = False
+                self.anim_flag = False
+            else:
+                self.coords.x += self.velocity.x
+                self.velocity.x += 0.981 * BRICK_SPEED * (-1 if self.counter.x < 0 else 1)
 
     
     def __start_falling(self) -> None:
         print(self.counter)
-        self._anim = True
+        self.anim = [True, True]
         self.limit.y = self.coords.y + (BRICK_GAP + BRICK_SIZE) * self.counter.y
         self.limit.x = self.coords.x + (BRICK_GAP + BRICK_SIZE) * self.counter.x
 
