@@ -57,7 +57,6 @@ class Brick:
 
     
     def __start_falling(self) -> None:
-        print(self.counter)
         self.anim = [True, True]
         self.limit.y = self.coords.y + (BRICK_GAP + BRICK_SIZE) * self.counter.y
         self.limit.x = self.coords.x + (BRICK_GAP + BRICK_SIZE) * self.counter.x
